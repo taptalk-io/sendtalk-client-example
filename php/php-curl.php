@@ -12,18 +12,22 @@
  */
 function sendTalkSendMessage($api_key, $phone, $message_type, $body, $filename, $caption) {
   $curl = curl_init();
+  
+  $data = [
+    'phone'       => $phone,
+    'messageType' => $message_type,
+    'body'        => $body
+  ];
+  if ($message_type != 'text' && $message_type != 'otp') {
+    $data['filename'] = $filename;
+    $data['caption']  = $caption;
+  }
 
   curl_setopt_array($curl, array(
     CURLOPT_URL => 'https://sendtalk-api.taptalk.io/api/v1/message/send_whatsapp',
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_CUSTOMREQUEST => 'POST',
-    CURLOPT_POSTFIELDS =>'{
-      "phone": "' . $phone . '",
-      "messageType": "' . $message_type . '",
-      "body": "' . $body . '",
-      "filename": "' . $filename . '",
-      "caption": "' . $caption . '"
-    }',
+    CURLOPT_POSTFIELDS => json_encode($data),
     CURLOPT_HTTPHEADER => array(
       'API-Key: ' . $api_key,
       'Content-Type: application/json'
